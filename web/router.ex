@@ -7,18 +7,18 @@ defmodule CercleApi.Router do
     plug :fetch_session
     plug :fetch_flash
     plug :put_secure_browser_headers
-    plug :current_user
-    plug :put_user_token
+    #plug :current_user
+    #plug :put_user_token
   end
 
-  defp put_user_token(conn, _) do
-    if current_user = conn.assigns[:current_user] do
-      token = Phoenix.Token.sign(conn, "user socket", current_user.id)
-      assign(conn, :user_token, token)
-    else
-      conn
-    end
-  end
+  # defp put_user_token(conn, _) do
+  #   if current_user = conn.assigns[:current_user] do
+  #     token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+  #     assign(conn, :user_token, token)
+  #   else
+  #     conn
+  #   end
+  # end
 
   pipeline :basic_auth do
     plug BasicAuth, use_config: {:cercleApi, :basic_auth}
@@ -27,22 +27,37 @@ defmodule CercleApi.Router do
   pipeline :api do
     plug :accepts, ["json"]
   end
-	
-  scope "/", CercleApi do
-    pipe_through :browser # Use the default browser stack
 
+	pipeline :browser_auth do
+    plug Guardian.Plug.VerifySession
+    plug Guardian.Plug.LoadResource
+  end
+
+  pipeline :require_login do
+    plug Guardian.Plug.EnsureAuthenticated, handler: CercleApi.GuardianErrorHandler
+    plug CercleApi.Plugs.CurrentUser
+  end
+
+  scope "/", CercleApi do
+    pipe_through [:browser, :browser_auth]
     get "/login", SessionController, :new
     post "/login", SessionController, :create
-    get "/logout", SessionController, :delete
     get "/register", RegistrationController, :new
     post "/register", RegistrationController, :create
+  end
+
+  scope "/", CercleApi do
+    pipe_through [:browser, :browser_auth, :require_login]
+    #pipe_through :browser # Use the default browser stack
+
+    get "/logout", SessionController, :delete
 
     get "/forget-password", PasswordController, :forget_password
     post "/reset-password", PasswordController, :reset_password
     get "/password/reset/:password_reset_code/confirm", PasswordController, :confirm
     post "/password/reset/:password_reset_code/confirm", PasswordController, :confirm_submit
 
-    get "/", PageController, :index   
+    get "/", PageController, :index
 
     get "/settings/profile_edit", SettingsController, :profile_edit
     put "/settings/profile_update", SettingsController, :profile_update
@@ -52,7 +67,7 @@ defmodule CercleApi.Router do
     put "/settings/team_update", SettingsController, :team_update
     get "/settings/fields_edit", SettingsController, :fields_edit
     put "/settings/fields_update", SettingsController, :fields_update
-    
+
     get "/organizations", OrganizationsController, :index
     get "/organizations/:id", OrganizationsController, :edit
 
@@ -66,14 +81,14 @@ defmodule CercleApi.Router do
 
     get "/statistics", ContactsController, :statistics
 
-    get "/redirect_app", PageController, :redirect_app 
+    get "/redirect_app", PageController, :redirect_app
 
   end
-		
+
   scope "/", CercleApi do
     pipe_through :api
 
-    
+
 
     get "/api/v2/timeline_events", APIV2.TimelineEventController, :index
     post "/api/v2/timeline_events", APIV2.TimelineEventController, :create
