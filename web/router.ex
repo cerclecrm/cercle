@@ -1,24 +1,12 @@
 defmodule CercleApi.Router do
   use CercleApi.Web, :router
-  use Passport
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
     plug :put_secure_browser_headers
-    #plug :current_user
-    #plug :put_user_token
   end
-
-  # defp put_user_token(conn, _) do
-  #   if current_user = conn.assigns[:current_user] do
-  #     token = Phoenix.Token.sign(conn, "user socket", current_user.id)
-  #     assign(conn, :user_token, token)
-  #   else
-  #     conn
-  #   end
-  # end
 
   pipeline :basic_auth do
     plug BasicAuth, use_config: {:cercleApi, :basic_auth}
@@ -38,27 +26,28 @@ defmodule CercleApi.Router do
     plug CercleApi.Plugs.CurrentUser
   end
 
+  pipeline :already_authenticated do
+    plug Guardian.Plug.EnsureNotAuthenticated, handler: CercleApi.GuardianAlreadyAuthenticatedHandler
+  end
+
   scope "/", CercleApi do
-    pipe_through [:browser, :browser_auth]
+    pipe_through [:browser, :browser_auth, :already_authenticated]
     get "/login", SessionController, :new
     post "/login", SessionController, :create
     get "/register", RegistrationController, :new
     post "/register", RegistrationController, :create
-  end
-
-  scope "/", CercleApi do
-    pipe_through [:browser, :browser_auth, :require_login]
-    #pipe_through :browser # Use the default browser stack
-
-    get "/logout", SessionController, :delete
 
     get "/forget-password", PasswordController, :forget_password
     post "/reset-password", PasswordController, :reset_password
     get "/password/reset/:password_reset_code/confirm", PasswordController, :confirm
     post "/password/reset/:password_reset_code/confirm", PasswordController, :confirm_submit
+  end
 
+  scope "/", CercleApi do
+    pipe_through [:browser, :browser_auth, :require_login]
+
+    get "/logout", SessionController, :delete
     get "/", PageController, :index
-
     get "/settings/profile_edit", SettingsController, :profile_edit
     put "/settings/profile_update", SettingsController, :profile_update
     get "/settings/company_edit", SettingsController, :company_edit
@@ -72,9 +61,9 @@ defmodule CercleApi.Router do
     get "/organizations/:id", OrganizationsController, :edit
 
     get "/contacts", ContactsController, :index
-	get "/contacts/new", ContactsController, :new
+	  get "/contacts/new", ContactsController, :new
     get "/contacts/:id", ContactsController, :edit
-	put "/contacts/:id/update", ContactsController, :update
+	  put "/contacts/:id/update", ContactsController, :update
 
     get "/opportunity", OpportunityController, :index
     get "/activity", ActivityController, :index
