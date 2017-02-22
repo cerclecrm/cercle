@@ -22,7 +22,7 @@ You need to setup a postgresql DB.
 5. You're good to go!
 
 ## Using Docker For Development
-1. Give you already have docker and docker-compose installed on your machine, Simply run these following commands:
+1. Given you already have docker and docker-compose installed on your machine, Simply run these following commands:
 ```
 # Build all and pull images and containers
 docker-compose build
