@@ -27,7 +27,8 @@ You need to setup a postgresql DB.
 # Build all and pull images and containers
 docker-compose build
 # Build application dependencies.
-chmod +x build # This will set permission to allow our build script to run.
+# This will set permission to allow our build script to run.
+chmod +x build
 ./build
 # Build the Docker image and start the `web` container, daemonized
 docker-compose up -d web
