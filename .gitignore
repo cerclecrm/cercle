@@ -3,6 +3,7 @@
 /db
 /deps
 /*.ez
+/.vscode
 
 # Generate on crash by the VM
 erl_crash.dump
@@ -25,3 +26,4 @@ erl_crash.dump
 
 
 /tmp
+/yarn.lock

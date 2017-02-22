@@ -1,0 +1,8 @@
+#!/bin/bash
+
+docker-compose run web mix deps.get
+docker-compose run web mix compile
+docker-compose run web mix ecto.create
+docker-compose run web mix ecto.migrate
+docker-compose run web yarn
+docker-compose run web node node_modules/brunch/bin/brunch build

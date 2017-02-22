@@ -21,4 +21,16 @@ You need to setup a postgresql DB.
 4. add others parameters from dev.secret into Heroku config:set
 5. You're good to go!
 
+## Using Docker For Development
+1. Give you already have docker and docker-compose installed on your machine, Simply run these following commands:
+```
+# Build all and pull images and containers
+docker-compose build
+# Build application dependencies.
+chmod +x build # This will set permission to allow our build script to run.
+./build
+# Build the Docker image and start the `web` container, daemonized
+docker-compose up -d web
+```
+
 

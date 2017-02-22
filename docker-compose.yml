@@ -1,0 +1,29 @@
+web:
+  build: .
+  dockerfile: Dockerfile
+  command: mix phoenix.server
+  environment:
+    - MIX_ENV=dev
+    - PORT=4000
+    - AWS_BUCKET=
+    - AWS_KEY=
+    - AWS_SECRET=
+    - AWS_REGION=
+    - SMTP_HOST=smtp.postmarkapp.com
+    - SMTP_PORT=587
+    - SMTP_USER=user
+    - SMTP_PASS=pass
+    - DB_USER=postgres
+    - DB_PASS=postgres
+    - DB_NAME=cercle_dev
+    - DB_HOST=postgres
+  volumes:
+    - .:/app
+  ports:
+    - "4000:4000"
+  links:
+    - postgres
+postgres:
+  image: postgres:9.6.1
+  ports:
+    - "5432"
