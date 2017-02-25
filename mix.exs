@@ -48,8 +48,10 @@ defmodule CercleApi.Mixfile do
      {:timex, "~> 3.1.8"},
      {:gettext, "~> 0.13.0"},
      {:basic_auth, "~> 2.0.0"},
-     {:passport, git: "https://github.com/opendrops/passport.git"},
-     {:tzdata, "~> 0.5.8"}]
+     {:tzdata, "~> 0.5.8"},
+     {:guardian, "~> 0.14.2"},
+     {:comeonin, "~> 2.5"}
+    ]
   end
 
   # Aliases are shortcut or tasks specific to the current project.

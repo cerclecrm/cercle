@@ -28,8 +28,10 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
-config :passport,
-  resource: CercleApi.User,
-  repo: CercleApi.Repo
+config :guardian, Guardian,
+  issuer: "CercleApi",
+  ttl: { 3, :days },
+  verify_issuer: true,
+  serializer: CercleApi.GuardianSerializer
 
 config :cercleApi, ecto_repos: [CercleApi.Repo]

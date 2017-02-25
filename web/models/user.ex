@@ -1,7 +1,6 @@
 defmodule CercleApi.User do
   use CercleApi.Web, :model
   use Arc.Ecto.Model
-  alias Passport.Password
 
   schema "users" do
     field :user_name, :string #is full rname
@@ -42,7 +41,7 @@ defmodule CercleApi.User do
     |> changeset(params)
     |> cast(params, ~w(password), [])
     |> validate_length(:password, min: 6, max: 100)
-    |> put_hashed_password()
+    |> generate_encrypted_password()
   end
 
   def update_changeset(model, params) do
@@ -51,19 +50,19 @@ defmodule CercleApi.User do
       |> changeset(params)
       |> cast(params, ~w(password), [])
       |> validate_length(:password, min: 6, max: 100)
-      |> put_hashed_password()
+      |> generate_encrypted_password()
     else
       model
       |> changeset(params)
     end
   end
 
-  defp put_hashed_password(changeset) do
-    case changeset do
-      %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
-        put_change(changeset, :password_hash, Password.hash(pass))
-        _ ->
-          changeset
+  defp generate_encrypted_password(current_changeset) do
+    case current_changeset do
+      %Ecto.Changeset{valid?: true, changes: %{password: password}} ->
+        put_change(current_changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(password))
+      _ ->
+        current_changeset
     end
   end
 end

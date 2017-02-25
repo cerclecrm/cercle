@@ -1,8 +1,6 @@
 defmodule CercleApi.ContactsController do
   use CercleApi.Web, :controller
 
-  plug CercleApi.Plugs.RequireAuth
-
   alias CercleApi.Contact
   alias CercleApi.Organization
   alias CercleApi.TimelineEvent
@@ -11,9 +9,9 @@ defmodule CercleApi.ContactsController do
   alias CercleApi.Tag
 
 	require Logger
-	
+
   def index(conn, _params) do
-    
+
     company_id = conn.assigns[:current_user].company_id
     company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload [:users]
 
@@ -24,19 +22,17 @@ defmodule CercleApi.ContactsController do
 		leads_pending = Repo.all(query)   |> Repo.preload([:organization,timeline_event: from(CercleApi.TimelineEvent, order_by: [desc: :inserted_at])])
 
 		conn
-		  |> put_layout("adminlte.html")
-		  |> render("index.html", leads_pending: leads_pending , company: company)
+		|> put_layout("adminlte.html")
+		|> render("index.html", leads_pending: leads_pending , company: company)
   end
-
-
 
   def new(conn, _params) do
     company_id = conn.assigns[:current_user].company_id
     company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload [:users]
 
     conn
-      |> put_layout("adminlte.html")
-      |> render("new.html", company: company)
+    |> put_layout("adminlte.html")
+    |> render("new.html", company: company)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -68,8 +64,8 @@ defmodule CercleApi.ContactsController do
     activities = Repo.all(query) |> Repo.preload [:user]
 
     opportunity = List.first(opportunities)
-    if opportunity do 
-      contact_ids = opportunity.contact_ids
+    if opportunity do
+    contact_ids = opportunity.contact_ids
       query = from contact in CercleApi.Contact,
         where: contact.id in ^contact_ids
       opportunity_contacts = Repo.all(query)
@@ -81,12 +77,12 @@ defmodule CercleApi.ContactsController do
 
     tag_ids = Enum.map(contact.tags, fn(t) -> t.id end)
 
-    
+
 
     changeset = Contact.changeset(contact)
 		conn
-		  |> put_layout("adminlte.html")
-		  |> render("edit.html", activities: activities, opportunity: opportunity, contact: contact, changeset: changeset, company: company, events: events, organizations: organizations, opportunity_contacts: opportunity_contacts, tags: tags, tag_ids: tag_ids)
+		|> put_layout("adminlte.html")
+		|> render("edit.html", activities: activities, opportunity: opportunity, contact: contact, changeset: changeset, company: company, events: events, organizations: organizations, opportunity_contacts: opportunity_contacts, tags: tags, tag_ids: tag_ids)
   end
 
 
@@ -94,7 +90,7 @@ defmodule CercleApi.ContactsController do
   def update(conn, %{"id" => id, "reward" => reward_params, "comment" => comment}) do
   end
 
-  
+
   def statistics(conn, _params) do
     company_id = conn.assigns[:current_user].company_id
     company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload [:users]
@@ -107,7 +103,7 @@ defmodule CercleApi.ContactsController do
         where: p.event_name == "meeting",
         order_by: [desc: p.updated_at]
       nb_meetings = length(Repo.all(query))
-      
+
 
       query = from p in TimelineEvent,
         where: p.user_id == ^user_id,
@@ -115,7 +111,7 @@ defmodule CercleApi.ContactsController do
         where: p.event_name == "call",
         order_by: [desc: p.updated_at]
       nb_calls = length(Repo.all(query))
-      
+
 
       query = from p in TimelineEvent,
         where: p.user_id == ^user_id,
@@ -126,8 +122,8 @@ defmodule CercleApi.ContactsController do
       Map.put(acc, x.id, [nb_meetings, nb_calls, nb_emails])
     end
     conn
-      |> put_layout("adminlte.html")
-      |> render("statistics.html", company: company, stat: map)
+    |> put_layout("adminlte.html")
+    |> render("statistics.html", company: company, stat: map)
   end
 
 end

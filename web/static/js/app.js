@@ -25,6 +25,7 @@ import adminlte from "./adminlte/dist/js/app.min"
 
 import socket from "./socket"
 import selectize from "./selectize"
+import jquery_ui from "./jquery_ui"
 import { Activity } from "./activity"
 import contact_add from "./contact_add"
 import { ContactEdit } from "./contact_edit"
@@ -44,5 +45,25 @@ export var App = {
   contact_socket_init: function(contact_id){
     contact_live.init(socket, contact_id );
   }
+}
+
+import Vue from 'vue'
+import MyApp from "../components/my-app.vue"
+
+// Create the main component
+Vue.component('my-app', MyApp)
+
+// And create the top-level view model:
+if ($("#app").length > 0){
+  new Vue({
+    el: '#app',
+    render(createElement) {
+      return createElement(MyApp, {})
+    }
+  });
+}
+
+if ($("#opportunity_pipeline").length > 0){
+  App.pipeline_init();
 }
 

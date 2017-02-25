@@ -1,27 +1,23 @@
 defmodule CercleApi.ActivityController do
   use CercleApi.Web, :controller
 
-  plug CercleApi.Plugs.RequireAuth
-
-  alias CercleApi.User
-  alias CercleApi.Contact
-  alias CercleApi.Activity
-  alias CercleApi.Organization
-  alias CercleApi.TimelineEvent
-  alias Passport.Session
-  alias CercleApi.Company
+  alias CercleApi.{User, Contact, Activity,
+                   Organization, TimelineEvent, Company}
 
 	require Logger
-	
-  
-  def index(conn, _params) do
 
-    current_user_id = conn.assigns[:current_user].id
-    current_user_time_zone = conn.assigns[:current_user].time_zone
-    company_id = conn.assigns[:current_user].company_id
-    company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload([:users])
-    # %{year: year, month: month, day: day} = DateTime.utc_now
+
+  def index(conn, _params) do
+    current_user = Guardian.Plug.current_resource(conn)
+    |> Repo.preload(:company)
+    current_user_id = current_user.id
+    current_user_time_zone = current_user.time_zone
+    company_id = current_user.company.id
+    company = Repo.get!(CercleApi.Company, company_id)
+    |> Repo.preload([:users])
+
     %{year: year, month: month, day: day} = Timex.now(current_user_time_zone)
+
     {:ok, date} = Date.new(year, month, day)
     date_erl = Date.to_erl(date)
     from_time = Ecto.DateTime.from_erl({date_erl,{0, 0, 0}})
@@ -56,9 +52,8 @@ defmodule CercleApi.ActivityController do
     activities_later = Repo.all(query_later)   |> Repo.preload([:contact, :user])
 
 		conn
-		  |> put_layout("adminlte.html")
-		  |> render("index.html", activities_today: activities_today, activities_overdue: activities_overdue, activities_later: activities_later, company: company, current_user_id: current_user_id, current_user_time_zone: current_user_time_zone)
+		|> put_layout("adminlte.html")
+		|> render("index.html", activities_today: activities_today, activities_overdue: activities_overdue, activities_later: activities_later, company: company, current_user_id: current_user_id, current_user_time_zone: current_user_time_zone)
   end
-
 
 end

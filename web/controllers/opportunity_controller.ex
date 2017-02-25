@@ -1,53 +1,50 @@
 defmodule CercleApi.OpportunityController do
   use CercleApi.Web, :controller
 
-  plug CercleApi.Plugs.RequireAuth
-
   alias CercleApi.User
   alias CercleApi.Contact
   alias CercleApi.Organization
   alias CercleApi.Opportunity
   alias CercleApi.TimelineEvent
-  alias Passport.Session
-	
+
   alias CercleApi.Company
 
 	require Logger
-	
+
   def index(conn, _params) do
-    
+
     company_id = conn.assigns[:current_user].company_id
     company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload [:users]
 
     query0 = from p in Opportunity,
-        where: p.company_id == ^company_id,
-        where: p.status == 0,
-        where: p.stage == 0,
-        order_by: [desc: p.updated_at]
+      where: p.company_id == ^company_id,
+      where: p.status == 0,
+      where: p.stage == 0,
+      order_by: [desc: p.updated_at]
 
     query1 = from p in Opportunity,
-        where: p.company_id == ^company_id,
-        where: p.status == 0,
-        where: p.stage == 1,
-        order_by: [desc: p.updated_at]
+      where: p.company_id == ^company_id,
+      where: p.status == 0,
+      where: p.stage == 1,
+      order_by: [desc: p.updated_at]
 
     query2 = from p in Opportunity,
-        where: p.company_id == ^company_id,
-        where: p.status == 0,
-        where: p.stage == 2,
-        order_by: [desc: p.updated_at]
+      where: p.company_id == ^company_id,
+      where: p.status == 0,
+      where: p.stage == 2,
+      order_by: [desc: p.updated_at]
 
     query3 = from p in Opportunity,
-        where: p.company_id == ^company_id,
-        where: p.status == 0,
-        where: p.stage == 3,
-        order_by: [desc: p.updated_at]
+      where: p.company_id == ^company_id,
+      where: p.status == 0,
+      where: p.stage == 3,
+      order_by: [desc: p.updated_at]
 
     query4 = from p in Opportunity,
-        where: p.company_id == ^company_id,
-        where: p.status == 0,
-        where: p.stage == 4,
-        order_by: [desc: p.updated_at]
+      where: p.company_id == ^company_id,
+      where: p.status == 0,
+      where: p.stage == 4,
+      order_by: [desc: p.updated_at]
 
     #order_by: [desc: p.rating]
     #from(CercleApi.TimelineEvent], order_by: [desc: :inserted_at])
@@ -60,18 +57,18 @@ defmodule CercleApi.OpportunityController do
 
 
 		conn
-		  |> put_layout("adminlte.html")
-		  |> render "index.html",  company: company, stage0: stage0, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4
+		|> put_layout("adminlte.html")
+		|> render "index.html",  company: company, stage0: stage0, stage1: stage1, stage2: stage2, stage3: stage3, stage4: stage4
   end
 
   def new(conn, _params) do
-    
+
     company_id = conn.assigns[:current_user].company_id
     company = Repo.get!(CercleApi.Company, company_id) |> Repo.preload [:users]
 
     conn
-      |> put_layout("app2.html")
-      |> render "new.html", company: company
+    |> put_layout("app2.html")
+    |> render "new.html", company: company
   end
 
   def edit(conn, %{"id" => id}) do
@@ -90,8 +87,8 @@ defmodule CercleApi.OpportunityController do
 
     changeset = Contact.changeset(reward)
 		conn
-		  |> put_layout("adminlte.html")
-		  |> render "edit.html", reward: reward, changeset: changeset, company: company, reward_status_history: reward_status_history, organizations: organizations
+		|> put_layout("adminlte.html")
+		|> render "edit.html", reward: reward, changeset: changeset, company: company, reward_status_history: reward_status_history, organizations: organizations
   end
 
 

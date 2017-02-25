@@ -87,8 +87,12 @@ config :cercleApi, basic_auth: [
   ]
 
 config :mailman,
-  relay: System.get_env("MAILMAN_RELAY"),                 
+  relay: System.get_env("MAILMAN_RELAY"),
   username: System.get_env("MAILMAN_USERNAME"),
   password: System.get_env("MAILMAN_PASSWORD"),
   port: 587,
   tls: :always
+
+# Configure guardian
+config :guardian, Guardian,
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")

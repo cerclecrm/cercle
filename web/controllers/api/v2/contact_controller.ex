@@ -79,6 +79,8 @@ defmodule CercleApi.APIV2.ContactController do
 
     case Repo.update(changeset) do
       {:ok, contact} ->
+        channel = "contacts:"  <> to_string(contact.id)
+        CercleApi.Endpoint.broadcast!( channel, "state", contact)
         render(conn, "show.json", contact: contact)
       {:error, changeset} ->
         conn

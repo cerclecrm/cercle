@@ -2,7 +2,8 @@ defmodule CercleApi.PageController do
   use CercleApi.Web, :controller
 
   def index(conn, _params) do
-    if (conn.assigns[:current_user] && is_integer(conn.assigns[:current_user].company_id) ) do
+    current_user = Guardian.Plug.current_resource(conn)
+    if (current_user && is_integer(current_user.company_id) ) do
       conn
         |> redirect(to: "/activity")
         |> halt
@@ -11,6 +12,6 @@ defmodule CercleApi.PageController do
         |> put_layout("app.html")
         |> render("index.html")
     end
-  end	
+  end
 
 end

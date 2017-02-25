@@ -1,9 +1,7 @@
 defmodule CercleApi.RegistrationController do
   use CercleApi.Web, :controller
 
-  alias CercleApi.User
-  alias CercleApi.Company
-  alias Passport.Session
+  alias CercleApi.{ User, Company }
 
   def new(conn, _params) do
     changeset = User.changeset(%CercleApi.User{})
@@ -20,14 +18,13 @@ defmodule CercleApi.RegistrationController do
         case Repo.insert(changeset) do
           {:ok, user} ->
             conn
-              |> assign(:current_user, user)
-              |> put_session(:user_id, user.id)
-              |> configure_session(renew: true)
-              |> put_flash(:info, "Account created!")
-              |> redirect(to: "/opportunity")
+            |> Guardian.Plug.sign_in(user)
+            |> configure_session(renew: true)
+            |> put_flash(:info, "Account created!")
+            |> redirect(to: "/opportunity")
           {:error, changeset} ->
             conn
-              |> render(:new, changeset: changeset)
+            |> render(:new, changeset: changeset)
         end
       {:error, changeset} ->
         conn
