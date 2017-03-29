@@ -25,7 +25,7 @@ defmodule CercleApi.APIV2.TimelineEventController do
         channel = "contacts:"  <> to_string(timeline_event_reload.contact_id)
         CercleApi.Endpoint.broadcast!(channel, "new:timeline_event", %{"html" => html})
         CercleApi.Endpoint.broadcast!(
-          "opportunities:"  <> to_string(timeline_event_reload.opportunity_id),
+          "contacts:"  <> to_string(timeline_event_reload.contact_id),
           "timeline_event:created", %{"event" => timeline_event_reload}
         )
 

@@ -63,6 +63,7 @@
             :user_image="user_image"
             v-on:browse="browseOpportunities = true"
             :socket="socket"
+            :channel="channel"
             />
 
         </div>

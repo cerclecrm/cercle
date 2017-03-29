@@ -79,7 +79,7 @@
 
   export default {
     props: [
-      'socket',
+      'socket', 'channel',
       'contact', 'time_zone', 'current_user_id',
       'opportunity', 'company',
       'opportunities',
@@ -217,7 +217,7 @@
           this.$data.activities.splice(itemIndex, 1, payload.activity);
         });
 
-        this.opportunityChannel.on('timeline_event:created', payload => {
+        this.channel.on('timeline_event:created', payload => {
           this.$data.events.unshift(payload.event);
         });
 
