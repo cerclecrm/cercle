@@ -13,6 +13,22 @@ defmodule CercleApi.APIV2.CardController do
   unauthorized_handler: {CercleApi.Helpers, :handle_json_unauthorized},
   not_found_handler: {CercleApi.Helpers, :handle_json_not_found}
 
+  def index(conn, %{"board_id" => board_id, "board_column_id" => board_column_id}) do
+    current_user = CercleApi.Plug.current_user(conn)
+    company = current_company(conn, current_user)
+    
+    query = from p in Card,
+      where: p.board_id == ^board_id,
+      where: p.board_column_id == ^board_column_id,
+      order_by: [desc: p.updated_at]
+
+    cards = query
+    |> Repo.all
+    # PRELOAD MAIN CONTATCT HERE
+
+    render(conn, "index.json", cards: cards)
+  end
+
   def index(conn, %{"contact_id" => contact_id, "archived" => archived}) do
     current_user = CercleApi.Plug.current_user(conn)
     company = current_company(conn, current_user)
