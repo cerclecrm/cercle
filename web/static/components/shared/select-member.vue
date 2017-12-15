@@ -40,16 +40,11 @@ export default {
   },
   computed: {
     currentMember() {
-      for(var i=0; i<this.users.length; i++) {
-        if(this.users[i].id === this.v)
-          return this.users[i];
-      }
+      return this.$_.find(this.users, {'id' : parseInt(this.v)});
     }
   },
   watch: {
-    'value': function() {
-      this.v = this.value;
-    }
+    'value': function() { this.v = this.value; }
   },
   methods: {
     memberClass(user) {

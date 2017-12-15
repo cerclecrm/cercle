@@ -9,8 +9,11 @@ defmodule CercleApi.APIV2.CompanyView do
     %{data: render_one(company, CercleApi.APIV2.CompanyView, "company.json")}
   end
 
+  def render("users.json", %{company: company}) do
+    %{users: company.users}
+  end
+
   def render("company.json", %{company: company}) do
-    %{id: company.id,
-      title: company.title}
+    %{id: company.id, title: company.title}
   end
 end

@@ -120,6 +120,22 @@ defmodule CercleApi.APIV2.CardController do
     end
   end
 
+  def reassign(conn, %{"user_id" => user_id, "card_ids" => card_ids}) do
+    current_user = CercleApi.Plug.current_user(conn)
+    query = from(c in Card, where: c.id in ^card_ids)
+    query
+    |> Repo.all
+    |> Enum.each(fn card ->
+      with changeset <- Card.changeset(card, %{user_id: user_id}),
+      {:ok, updated_card} <- Repo.update(changeset),
+      new_card <- Repo.preload(updated_card, [:board_column, board: [:board_columns]]) do
+        CardService.update(current_user, new_card, card)
+      end
+    end
+    )
+    json conn, %{status: 200}
+  end
+
   def delete(conn, %{"id" => id}) do
     card = Repo.get!(Card, id)
 

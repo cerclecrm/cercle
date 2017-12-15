@@ -274,14 +274,14 @@
 
           // Uploaded successfully
           if (newFile.success !== oldFile.success) {
-             this.$notification.$emit('alert', {'msg': 'Finished!'});
+            this.$notification.$emit('alert', {'msg': 'Finished!'});
           }
         }
 
         // Automatic upload
         if (Boolean(newFile) !== Boolean(oldFile) || oldFile.error !== newFile.error) {
           if (!this.$refs.attachment.active) {
-            this.$refs.attachment.active = true
+            this.$refs.attachment.active = true;
           }
         }
       },
