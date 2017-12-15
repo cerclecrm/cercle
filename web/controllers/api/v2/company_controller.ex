@@ -55,4 +55,11 @@ defmodule CercleApi.APIV2.CompanyController do
 
     send_resp(conn, :no_content, "")
   end
+
+  def users(conn, _params) do
+    company = conn
+    |> current_company()
+    |> Repo.preload(:users)
+    render(conn, "users.json", company: company)
+  end
 end

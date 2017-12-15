@@ -118,13 +118,14 @@ defmodule CercleApi.Router do
     pipe_through [:api, :api_auth]
     resources "/contact", ContactController
 
+    get "/company/users", CompanyController, :users
     post "/contact/export", ContactExportController, :export
     put "/contact/:id/update_tags", ContactController, :update_tags
     put "/contact/:id/utags", ContactController, :utags
     delete "/contact/multiple/delete", ContactController, :multiple_delete
 
     resources "/organizations", OrganizationController
-
+    put "/card/reassign", CardController, :reassign, as: :reassign
     resources "/card", CardController do
       resources "/attachments", CardAttachmentController,
         only: [:index, :create, :delete]

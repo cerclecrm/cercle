@@ -44,7 +44,15 @@
       </div>
 
       <div class="row" v-if="cards.length > 0">
-        <div class="col-xs-12"><h3>Cards assigned to me</h3></div>
+        <div class="col-xs-12">
+          <h3 class="pull-left">Cards assigned to me</h3>
+          <label class="assigned-user pull-right">
+            <select-member
+              v-model.number="assignUserId"
+              :users="companyUsers"
+              @change="changeAssignedUser"/>
+          </label>
+        </div>
       </div>
 
       <div class="row card-list" >
@@ -82,6 +90,7 @@
   import CardShow from '../cards/show.vue';
   import ActivityItem from './item.vue';
   import CardItem from './card-item.vue';
+  import SelectMember from '../shared/select-member.vue';
 
   export default {
     data() {
@@ -96,7 +105,9 @@
         socket: null,
         channel: null,
         userId: null,
-        cards: []
+        assignUserId: null,
+        cards: [],
+        companyUsers: []
       };
     },
     computed: {
@@ -115,9 +126,17 @@
       'modal': VueStrap.modal,
       'card-show': CardShow,
       'activity-item': ActivityItem,
-      'card-item': CardItem
+      'card-item': CardItem,
+      'select-member': SelectMember
     },
     methods: {
+      changeAssignedUser() {
+        let cardIds = this.$_.map(this.cards, 'id');
+        let url = '/api/v2/company/' + Vue.currentUser.companyId + '/card/reassign';
+        this.$http.put(
+          url, { userId: this.assignUserId, cardIds: cardIds }
+        ).then(resp => { this.cards = [];  });
+      },
       groupBy(list, prop) {
         return list.reduce(function(groups, item) {
           let val = item[prop].name;
@@ -199,12 +218,22 @@
     mounted() {
       this.timeZone = Vue.currentUser.timeZone;
       this.userId = Vue.currentUser.userId;
+      this.assignUserId = Vue.currentUser.userId;
       this.initConn();
+      let url = '/api/v2/company/' + Vue.currentUser.companyId + '/company/users';
+      this.$http.get(url).then(resp => {
+        this.companyUsers = resp.data.users;
+      });
     }
   };
 </script>
 <style lang="sass">
   .inbox-list {
+    .assigned-user {
+      background-color: #dfe1e4;
+      padding: 4px 15px 4px 15px;
+      margin-top: 12px;
+    }
     .activity-list {
       .panel {
         margin-bottom: 5px;
